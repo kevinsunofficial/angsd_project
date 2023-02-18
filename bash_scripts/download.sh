@@ -22,9 +22,8 @@ do
         then
             fastq1="${response_dir}${acc}_1.fastq.gz"
             fastq2="${response_dir}${acc}_2.fastq.gz"
-            line1=`egrep -o ftp.sra.ebi.ac.uk/vol1/fastq/SRR150/[0-9]{3}/$acc/$fastq1 $ena_report`
-            line2=`egrep -o ftp.sra.ebi.ac.uk/vol1/fastq/SRR150/[0-9]{3}/$acc/$fastq2 $ena_report`
-            echo $line1 $line2
+            line1=`egrep -o "ftp.sra.ebi.ac.uk/vol1/fastq/SRR150/[0-9]{3}/${acc}/${acc}_1.fastq.gz" $ena_report`
+            line2=`egrep -o "ftp.sra.ebi.ac.uk/vol1/fastq/SRR150/[0-9]{3}/${acc}/${acc}_2.fastq.gz" $ena_report`
         fi
     fi
 done < $srr_list
