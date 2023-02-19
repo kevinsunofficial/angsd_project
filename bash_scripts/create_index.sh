@@ -12,9 +12,10 @@
 
 genome_dir="/athena/angsd/scratch/yus4008/project/dataset/hs1_genome/"
 genome_seq="${genome_dir}hs1.fa"
-genome_annot="${genome_dir}hs1.110.20220412.ncbiRefSeq.gtf."
+genome_annot="${genome_dir}hs1.110.20220412.ncbiRefSeq.gtf"
 genome_seq_gz="${genome_dir}hs1.fa.gz"
 genome_annot_gz="${genome_annot}.gz"
+ref_dir="/athena/angsd/scratch/yus4008/project/dataset/hs1_STARindex"
 
 
 if [ ! -f $genome_seq ]
@@ -38,6 +39,8 @@ fi
 
 mamba activate angsd
 
-echo "test if mamba activate successful"
+echo "mamba activated"
+
+STAR --runMode genomeGenerate --runThreadN 1 --genomeDir $ref_dir --genomeFastaFiles $genome_seq --sjdbGTFfile $genome_annot --sjdbOverhang 99
 
 mamba deactivate
