@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 # html
 *.html
+
+# log out file
+*.out
