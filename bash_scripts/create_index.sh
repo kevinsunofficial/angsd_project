@@ -10,6 +10,7 @@
 #SBATCH --mail-type=ALL
 
 
+script_dir="~yus4008/cmpb5004/project/angsd_project/bash_scripts/"
 dataset_dir="/athena/angsd/scratch/yus4008/project/dataset/"
 genome_dir="${dataset_dir}hg38_genome/"
 genome_seq="${genome_dir}hg38.fa"
@@ -40,8 +41,14 @@ fi
 
 mamba activate angsd
 
-echo "mamba activated"
+echo "mamba activated, switching directory to: ${ref_dir}"
+
+cd $ref_dir
 
 STAR --runMode genomeGenerate --runThreadN 1 --genomeDir $ref_dir --genomeFastaFiles $genome_seq --sjdbGTFfile $genome_annot --sjdbOverhang 99
+
+cd $script_dir
+
+echo "switching directory to: ${script_dir}, deactivate mamba"
 
 mamba deactivate
