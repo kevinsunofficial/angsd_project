@@ -13,12 +13,17 @@
 genome_dir="/athena/angsd/scratch/yus4008/project/dataset/hs1_genome/"
 genome_seq="${genome_dir}hs1.fa"
 genome_annot="${genome_dir}hs1.110.20220412.ncbiRefSeq.gtf."
+genome_seq_gz="${genome_dir}hs1.fa.gz"
 genome_annot_gz="${genome_annot}.gz"
 
 
 if [ ! -f $genome_seq ]
 then
-    wget -O $genome_seq "https://hgdownload.soe.ucsc.edu/goldenPath/hs1/bigZips/hs1.2bit"
+    if [ ! -f $genome_seq_gz ]
+    then
+        wget -O $genome_seq_gz "https://hgdownload.soe.ucsc.edu/goldenPath/hs1/bigZips/hs1.fa.gz"
+    fi
+    gzip -d $genome_seq_gz
 fi
 
 if [ ! -f $genome_annot ]
