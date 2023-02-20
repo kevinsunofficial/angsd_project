@@ -30,18 +30,18 @@ do
             acc=`echo $file | egrep -o "SRR([0-9]+)_(1|2)"`
             out_dir="${alignment_dir}${response}${acc}."
             out_file="${out_dir}Aligned.sortedByCoord.out.bam"
-            echo $acc
-            # if [ ! -f $out_file ]
-            # then
-            #     STAR --runMode alignReads \
-            #          --runThreadN 1 \
-            #          --genomeDir $ref_dir \
-            #          --readFilesIn $file \
-            #          --readFilesCommand zcat \
-            #          --outFileNamePrefix $out_dir \
-            #          --outSAMtype BAM SortedByCoordinate
-            # fi
-            # samtools index $out_file
+            # echo $acc
+            if [ ! -f $out_file ]
+            then
+                STAR --runMode alignReads \
+                     --runThreadN 1 \
+                     --genomeDir $ref_dir \
+                     --readFilesIn $file \
+                     --readFilesCommand zcat \
+                     --outFileNamePrefix $out_dir \
+                     --outSAMtype BAM SortedByCoordinate
+            fi
+            samtools index $out_file
         fi
     done
     current=$((current+1))
