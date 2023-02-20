@@ -31,7 +31,7 @@ do
             out_dir="${alignment_dir}${response}${acc}."
             out_file="${out_dir}Aligned.sortedByCoord.out.bam"
             # echo $acc
-            if [ ! -f $out_file ]
+            if [ ! -f "${out_file}" ]
             then
                 STAR --runMode alignReads \
                      --runThreadN 1 \
