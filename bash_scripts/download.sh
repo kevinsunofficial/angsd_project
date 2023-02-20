@@ -18,7 +18,7 @@ do
     then
         response_dir="${dataset_dir}${response}/"
         current=`ls $response_dir | wc -l`
-        if (( current < limit ))
+        if [[ $current -lt $limit ]]
         then
             fastq1="${response_dir}${acc}_1.fastq.gz"
             fastq2="${response_dir}${acc}_2.fastq.gz"
