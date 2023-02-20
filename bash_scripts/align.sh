@@ -30,6 +30,8 @@ do
             acc=`echo $file | egrep -o "SRR([0-9]+)_(1|2)"`
             out_dir="${alignment_dir}${response}${acc}."
             out_file="${out_dir}Aligned.sortedByCoord.out.bam"
+            out_flagstat="${out_dir}flagstats"
+            out_stats="${out_dir}stats"
             if [ ! -f "${out_file}" ]
             then
                 STAR --runMode alignReads \
@@ -41,9 +43,13 @@ do
                      --outSAMtype BAM SortedByCoordinate
             fi
             samtools index $out_file
+            samtools flagstat $out_file > $out_flagstat
+            samtools stats $out_file > $out_stats
             current=$((current+1))
         fi
     done
 done
+
+multiqc
 
 mamba deactivate
