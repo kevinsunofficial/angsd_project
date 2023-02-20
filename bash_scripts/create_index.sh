@@ -3,7 +3,7 @@
 #SBATCH --partition=angsd_class
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --job-name=20230212_align
+#SBATCH --job-name=create_index
 #SBATCH --time=08:00:00
 #SBATCH --mem=100G
 #SBATCH --mail-user=yus4008@med.cornell.edu
