@@ -21,6 +21,10 @@ mamba activate angsd
 
 /softlib/apps/EL7/BamQC/bin/bamqc -o $bamqc_dir --noextract $aln_dir/*/*.bam
 
+mamba deactivate
+
+mamba activate multiqc
+
 multiqc -o $multiqc_dir $aln_dir
 
 mamba deactivate
