@@ -23,14 +23,17 @@ for response in uninfected/ symptomatic/
 do
     use_dir="${dataset_dir}${response}"
     current=0
-    for file in "${use_dir}*"
+    for file in $use_dir*
     do
         if [[ $current < $limit ]]
         then
             acc=`echo $file | egrep -o "SRR([0-9]+)_(1|2)"`
             out_dir="${alignment_dir}${response}${acc}."
             out_file="${out_dir}Aligned.sortedByCoord.out.bam"
-            echo $file $acc $out_dir $out_file
+            echo file $file
+	    echo acc $acc
+	    echo outdir $out_dir
+	    echo outfile $out_file
             if [ ! -f "${out_file}" ]
             then
                 echo $out_file exists
