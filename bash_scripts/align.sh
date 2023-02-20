@@ -41,15 +41,19 @@ do
                      --readFilesCommand zcat \
                      --outFileNamePrefix $out_dir \
                      --outSAMtype BAM SortedByCoordinate
+                samtools index $out_file
             fi
-            samtools index $out_file
-            samtools flagstat $out_file > $out_flagstat
-            samtools stats $out_file > $out_stats
+            if [ ! -f "${out_flagstat}" ]
+            then
+                samtools flagstat $out_file > $out_flagstat
+            fi
+            if [ ! -f "${out_stats}" ]
+            then
+                samtools stats $out_file > $out_stats
+            fi
             current=$((current+1))
         fi
     done
 done
-
-multiqc
 
 mamba deactivate
