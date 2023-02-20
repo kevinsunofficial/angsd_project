@@ -4,8 +4,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --job-name=20230212_align
-#SBATCH --time=05:00:00
-#SBATCH --mem=32G
+#SBATCH --time=08:00:00
+#SBATCH --mem=100G
 #SBATCH --mail-user=yus4008@med.cornell.edu
 #SBATCH --mail-type=ALL
 
