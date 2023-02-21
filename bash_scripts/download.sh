@@ -27,10 +27,12 @@ do
             
             if [ ! -z "$line1" ]
             then
+                echo -e "wget -O ${fastq1} ftp://${line1}"
                 wget -O $fastq1 ftp://$line1
             fi
             if [ ! -z "$line2" ]
             then
+                echo -e "wget -O ${fastq2} ftp://${line2}"
                 wget -O $fastq2 ftp://$line2
             fi
         fi

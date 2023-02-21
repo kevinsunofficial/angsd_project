@@ -24,8 +24,10 @@ if [ ! -f $genome_seq ]
 then
     if [ ! -f $genome_seq_gz ]
     then
+        echo -e "wget -O ${genome_seq_gz} http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz"
         wget -O $genome_seq_gz "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz"
     fi
+    echo -e "gzip -d ${genome_seq_gz}"
     gzip -d $genome_seq_gz
 fi
 
@@ -33,8 +35,10 @@ if [ ! -f $genome_annot ]
 then
     if [ ! -f $genome_annot_gz ]
     then
+        echo -e "wget -O ${genome_seq_gz} http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.gtf.gz"
         wget -O $genome_annot_gz "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.gtf.gz"
     fi
+    echo -e "gzip -d ${genome_annot_gz}"
     gzip -d $genome_annot_gz
 fi
 
@@ -44,6 +48,13 @@ mamba activate angsd
 echo "mamba activated, switching directory to: ${ref_dir}"
 
 cd $ref_dir
+
+echo -e "STAR \t --runMode genomeGenerate \n
+            \t\t --runThreadN 1 \n
+            \t\t --genomeDir ${ref_dir} \n
+            \t\t --genomeFastaFiles ${genome_seq} \n
+            \t\t --sjdbGTFfile ${genome_annot} \n
+            \t\t --sjdbOverhang 99"
 
 STAR --runMode genomeGenerate \
      --runThreadN 1 \

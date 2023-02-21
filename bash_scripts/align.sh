@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --job-name=align_seqs
 #SBATCH --time=08:00:00
-#SBATCH --mem=100G
+#SBATCH --mem=64G
 #SBATCH --mail-user=yus4008@med.cornell.edu
 #SBATCH --mail-type=ALL
 
@@ -34,6 +34,13 @@ do
             out_stats="${out_dir}stats"
             if [ ! -f "${out_file}" ]
             then
+                echo -e "STAR \t --runMode alignReads \n
+                            \t\t --runThreadN 1 \n
+                            \t\t --genomeDir $ref_dir \n
+                            \t\t --readFilesIn $file \n
+                            \t\t --readFilesCommand zcat \n
+                            \t\t --outFileNamePrefix $out_dir \n
+                            \t\t --outSAMtype BAM SortedByCoordinate"
                 STAR --runMode alignReads \
                      --runThreadN 1 \
                      --genomeDir $ref_dir \
@@ -41,14 +48,17 @@ do
                      --readFilesCommand zcat \
                      --outFileNamePrefix $out_dir \
                      --outSAMtype BAM SortedByCoordinate
+                echo -e "samtools index ${out_file}"
                 samtools index $out_file
             fi
             if [ ! -f "${out_flagstat}" ]
             then
+                echo -e "samtools flagstat ${out_file} > ${out_flagstat}"
                 samtools flagstat $out_file > $out_flagstat
             fi
             if [ ! -f "${out_stats}" ]
             then
+                echo -e "samtools stats ${out_file} > ${out_stats}"
                 samtools stats $out_file > $out_stats
             fi
             current=$((current+1))
