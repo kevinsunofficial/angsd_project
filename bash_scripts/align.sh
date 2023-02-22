@@ -21,7 +21,7 @@ mamba activate angsd
 
 for response in uninfected/ symptomatic/
 do
-    use_dir="${dataset_dir}${response}"
+    use_dir="${dataset_dir}${response}trim/"
     current=0
     for file in $use_dir*
     do
