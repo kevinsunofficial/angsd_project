@@ -49,8 +49,6 @@ echo "mamba activated, switching directory to: ${ref_dir}"
 
 cd $ref_dir
 
-echo -e "STAR --runMode genomeGenerate --runThreadN 1 --genomeDir ${ref_dir} --genomeFastaFiles ${genome_seq} --sjdbGTFfile ${genome_annot} --sjdbOverhang 99"
-
 STAR --runMode genomeGenerate \
      --runThreadN 1 \
      --genomeDir $ref_dir \

@@ -34,7 +34,7 @@ do
             out_stats="${out_dir}stats"
             if [ ! -f "${out_file}" ]
             then
-                echo -e "STAR --runMode alignReads --runThreadN 1 --genomeDir $ref_dir --readFilesIn $file --readFilesCommand zcat --outFileNamePrefix $out_dir --outSAMtype BAM SortedByCoordinate"
+                echo -e "STAR --runMode alignReads --readFilesIn $file (${current})"
                 STAR --runMode alignReads \
                      --runThreadN 1 \
                      --genomeDir $ref_dir \
