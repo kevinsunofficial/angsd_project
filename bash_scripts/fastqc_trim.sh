@@ -3,7 +3,7 @@
 #SBATCH --partition=angsd_class
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --job-name=qc_analysis
+#SBATCH --job-name=fastqc_trim
 #SBATCH --time=08:00:00
 #SBATCH --mem=32G
 #SBATCH --mail-user=yus4008@med.cornell.edu
