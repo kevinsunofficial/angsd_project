@@ -23,7 +23,7 @@ for response in uninfected/ symptomatic/
 do
     use_dir="${dataset_dir}${response}trim/"
     current=0
-    for file in $use_dir*
+    for file in $use_dir*.fq.gz
     do
         if [[ $current -lt $limit ]]
         then
@@ -34,13 +34,7 @@ do
             out_stats="${out_dir}stats"
             if [ ! -f "${out_file}" ]
             then
-                echo -e "STAR \t --runMode alignReads \n
-                            \t\t --runThreadN 1 \n
-                            \t\t --genomeDir $ref_dir \n
-                            \t\t --readFilesIn $file \n
-                            \t\t --readFilesCommand zcat \n
-                            \t\t --outFileNamePrefix $out_dir \n
-                            \t\t --outSAMtype BAM SortedByCoordinate"
+                echo -e "STAR --runMode alignReads --runThreadN 1 --genomeDir $ref_dir --readFilesIn $file --readFilesCommand zcat --outFileNamePrefix $out_dir --outSAMtype BAM SortedByCoordinate"
                 STAR --runMode alignReads \
                      --runThreadN 1 \
                      --genomeDir $ref_dir \
