@@ -44,5 +44,9 @@ wget -O $fastqfile_output ftp://$ftplink
 ***2. Align the FASTQ file with an appropriate aligner (you may have to build a new index). Document:***
 
 * ***parameters (and why you chose them)***
+  + I used trim-galore to trim the reads. I used parameter of `--stringency 13` because the trim analysis suggests that with stringency being 13, it is more likely to prevent potentially wrong adapter trimming due to small overlaps.
+  + I used STAR aligner. I first created an index for STAR with `--sjdbOverhang 99`. The reason I didn't use read length -1 is that I did trim-galore on the reads, therefore the trimmed reads are not uniformly with read length of 150bp. In the STAR manual it suggests that in most cases, the default value of 100 as read length will work well, therefore I chose 100-1=99 for this parameter.
+  + I used `--outSAMtype BAM` to export the STAR alignment result in `.bam` format because it takes less space than `.sam`. I also added `SortedByCoordinate` so the information in the `.bam` file is sorted by coordinate.
 
 * ***summary of outcome and basic QC***
+  + The alignments have good mapping quality distributions, as around 70% of the reads are mapped with a MAPQ value higher than 241.
