@@ -3,7 +3,7 @@
 #SBATCH --partition=angsd_class
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --job-name=align_seqs
+#SBATCH --job-name=qc_analysis
 #SBATCH --time=08:00:00
 #SBATCH --mem=32G
 #SBATCH --mail-user=yus4008@med.cornell.edu
@@ -13,7 +13,7 @@
 script_dir="/home/yus4008/cmpb5004/project/angsd_project/bash_scripts/"
 dataset_dir="/athena/angsd/scratch/yus4008/project/dataset/"
 aln_dir="/athena/angsd/scratch/yus4008/project/dataset/alignments/"
-qc_dir="${dataset_dir}analysis_qc/"
+qc_dir="${dataset_dir}qc_analysis/"
 fastqc_dir="${qc_dir}fastqc/"
 bamqc_dir="${qc_dir}bamqc/"
 multiqc_dir="${qc_dir}multiqc/"
