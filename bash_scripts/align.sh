@@ -23,11 +23,12 @@ for response in uninfected/ symptomatic/
 do
     use_dir="${dataset_dir}${response}trim/"
     current=0
-    for file in $use_dir*.fq.gz
+    for file in $use_dir*_1_trimmed.fq.gz
     do
         if [[ $current -lt $limit ]]
         then
             acc=`echo $file | egrep -o "SRR([0-9]+)_(1|2)"`
+            file2="${use_dir}${acc}_2_trimmed.fq.gz"
             out_dir="${alignment_dir}${response}${acc}."
             out_file="${out_dir}Aligned.sortedByCoord.out.bam"
             out_flagstat="${out_dir}flagstats"
@@ -38,7 +39,7 @@ do
                 STAR --runMode alignReads \
                      --runThreadN 1 \
                      --genomeDir $ref_dir \
-                     --readFilesIn $file \
+                     --readFilesIn $file $file2 \
                      --readFilesCommand zcat \
                      --outFileNamePrefix $out_dir \
                      --outSAMtype BAM SortedByCoordinate
