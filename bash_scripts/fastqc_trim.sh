@@ -43,7 +43,8 @@ do
         acc=`echo $file | egrep -o "SRR([0-9]+)"`
         file2="${fastqc_use_dir}${acc}_2.fastq.gz"
         echo -e "trim_galore --illumina ${file} ${file2} --output_dir ${trim_out_dir} --stringency 13"
-        trim_galore --illumina --paired --output_dir $trim_out_dir --stringency 13 $file $file2 
+        trim_galore --illumina --paired --output_dir $trim_out_dir --stringency 13 $file $file2
+    done
     mamba deactivate
 
     echo -e "Perform fastqc on trimmed reads"
@@ -61,8 +62,8 @@ mamba deactivate
 
 mamba activate multiqc
 
-echo -e "multiqc -o ${untrim_multiqc_dir} ${untrim_fastqc_dir}"
-multiqc -o $untrim_multiqc_dir $untrim_fastqc_dir
+# echo -e "multiqc -o ${untrim_multiqc_dir} ${untrim_fastqc_dir}"
+# multiqc -o $untrim_multiqc_dir $untrim_fastqc_dir
 echo -e "multiqc -o ${trim_multiqc_dir} ${trim_fastqc_dir}"
 multiqc -o $trim_multiqc_dir $trim_fastqc_dir
 
