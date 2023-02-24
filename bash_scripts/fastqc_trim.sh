@@ -25,15 +25,15 @@ mamba activate angsd
 
 for response in uninfected/ symptomatic/
 do
-    echo -e "Perform fastqc on raw reads"
-    fastqc_use_dir="${dataset_dir}${response}"
-    fastqc_out_dir="${untrim_fastqc_dir}${response}"
-    for file in $fastqc_use_dir*.fastq.gz
-    do
-        acc=`echo $file | egrep -o "SRR([0-9]+)_(1|2)"`
-        echo -e "fastqc ${file} --noextract --outdir ${fastqc_out_dir}"
-        fastqc $file --noextract --outdir $fastqc_out_dir
-    done
+    # echo -e "Perform fastqc on raw reads"
+    # fastqc_use_dir="${dataset_dir}${response}"
+    # fastqc_out_dir="${untrim_fastqc_dir}${response}"
+    # for file in $fastqc_use_dir*.fastq.gz
+    # do
+    #     acc=`echo $file | egrep -o "SRR([0-9]+)_(1|2)"`
+    #     echo -e "fastqc ${file} --noextract --outdir ${fastqc_out_dir}"
+    #     fastqc $file --noextract --outdir $fastqc_out_dir
+    # done
 
     echo -e "Perform trim-galore"
     mamba activate trim-galore
