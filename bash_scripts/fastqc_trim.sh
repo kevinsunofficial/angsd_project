@@ -38,8 +38,12 @@ do
     echo -e "Perform trim-galore"
     mamba activate trim-galore
     trim_out_dir="${fastqc_use_dir}trim/"
-    echo -e "trim_galore --illumina ${fastqc_use_dir}*_1.fastq.gz ${fastqc_use_dir}*_2.fastq.gz --output_dir ${trim_out_dir} --stringency 13"
-    trim_galore --illumina --paired $fastqc_use_dir*_1.fastq.gz $fastqc_use_dir*_2.fastq.gz --output_dir $trim_out_dir --stringency 13
+    for file in $fastqc_use_dir*_1.fastq.gz
+    do
+        acc=`echo $file | egrep -o "SRR([0-9]+)"`
+        file2="${fastqc_use_dir}${acc}_2.fastq.gz"
+        echo -e "trim_galore --illumina ${file} ${file2} --output_dir ${trim_out_dir} --stringency 13"
+        trim_galore --illumina --paired --output_dir $trim_out_dir --stringency 13 $file $file2 
     mamba deactivate
 
     echo -e "Perform fastqc on trimmed reads"
