@@ -21,14 +21,14 @@ mamba activate angsd
 
 for response in uninfected/ symptomatic/
 do
-    use_dir="${dataset_dir}${response}trim/"
+    use_dir="${dataset_dir}${response}"
     current=0
-    for file in $use_dir*_1_trimmed.fq.gz
+    for file in $use_dir*_1.fastq.gz
     do
         if [[ $current -lt $limit ]]
         then
-            acc=`echo $file | egrep -o "SRR([0-9]+)_(1|2)"`
-            file2="${use_dir}${acc}_2_trimmed.fq.gz"
+            acc=`echo $file | egrep -o "SRR([0-9]+)"`
+            file2="${use_dir}${acc}_2.fastq.gz"
             out_dir="${alignment_dir}${response}${acc}."
             out_file="${out_dir}Aligned.sortedByCoord.out.bam"
             out_flagstat="${out_dir}flagstats"
