@@ -13,7 +13,7 @@
 script_dir="/home/yus4008/cmpb5004/project/angsd_project/bash_scripts/"
 dataset_dir="/athena/angsd/scratch/yus4008/project/dataset/"
 ref_dir="${dataset_dir}hg38_STARindex"
-alignment_dir="${dataset_dir}alignments/"
+alignment_dir="${dataset_dir}trim_alignments/"
 
 limit=1
 
@@ -21,21 +21,21 @@ mamba activate angsd
 
 for response in uninfected/ symptomatic/
 do
-    use_dir="${dataset_dir}${response}"
+    use_dir="${dataset_dir}${response}trim/"
     current=0
-    for file in $use_dir*_1.fastq.gz
+    for file in $use_dir*_1_val_1.fastq.gz
     do
         if [[ $current -lt $limit ]]
         then
             acc=`echo $file | egrep -o "SRR([0-9]+)"`
-            file2="${use_dir}${acc}_2.fastq.gz"
+            file2="${use_dir}${acc}_2_val_2.fastq.gz"
             out_dir="${alignment_dir}${response}${acc}."
             out_file="${out_dir}Aligned.sortedByCoord.out.bam"
             out_flagstat="${out_dir}flagstats"
             out_stats="${out_dir}stats"
             if [ ! -f "${out_file}" ]
             then
-                echo -e "STAR --runMode alignReads --readFilesIn $file (${current})"
+                echo -e "STAR --runMode alignReads --readFilesIn $acc (${current})"
                 STAR --runMode alignReads \
                      --runThreadN 1 \
                      --genomeDir $ref_dir \
