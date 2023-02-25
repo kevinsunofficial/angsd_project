@@ -23,12 +23,12 @@ for response in uninfected/ symptomatic/
 do
     use_dir="${dataset_dir}${response}trim/"
     current=0
-    for file in $use_dir*_1_val_1.fastq.gz
+    for file in $use_dir*_1_val_1.fq.gz
     do
         if [[ $current -lt $limit ]]
         then
             acc=`echo $file | egrep -o "SRR([0-9]+)"`
-            file2="${use_dir}${acc}_2_val_2.fastq.gz"
+            file2="${use_dir}${acc}_2_val_2.fq.gz"
             out_dir="${alignment_dir}${response}${acc}."
             out_file="${out_dir}Aligned.sortedByCoord.out.bam"
             out_flagstat="${out_dir}flagstats"
