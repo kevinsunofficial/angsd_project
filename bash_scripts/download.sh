@@ -25,12 +25,12 @@ do
             line1=`egrep -o "ftp.sra.ebi.ac.uk/vol1/fastq/SRR150/[0-9]{3}/${acc}/${acc}_1.fastq.gz" $ena_report`
             line2=`egrep -o "ftp.sra.ebi.ac.uk/vol1/fastq/SRR150/[0-9]{3}/${acc}/${acc}_2.fastq.gz" $ena_report`
             
-            if [ ! -z "$line1" ]
+            if [ ! -z "$line1" ] && [ ! -f "$fastq1" ]
             then
                 echo -e "wget -O ${fastq1} ftp://${line1}"
                 wget -O $fastq1 ftp://$line1
             fi
-            if [ ! -z "$line2" ]
+            if [ ! -z "$line2" ] && [ ! -f "$fastq2" ]
             then
                 echo -e "wget -O ${fastq2} ftp://${line2}"
                 wget -O $fastq2 ftp://$line2
