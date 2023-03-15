@@ -1,15 +1,5 @@
 #! /bin/bash
 
-#SBATCH --partition=angsd_class
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --job-name=download
-#SBATCH --time=08:00:00
-#SBATCH --mem=16G
-#SBATCH --mail-user=yus4008@med.cornell.edu
-#SBATCH --mail-type=ALL
-#SBATCH --output=download.out
-
 entry_dir="../entry/"
 ena_report="${entry_dir}filereport_read_run_PRJNA744408_tsv.txt"
 sra_table="${entry_dir}SraRunTable.csv"
