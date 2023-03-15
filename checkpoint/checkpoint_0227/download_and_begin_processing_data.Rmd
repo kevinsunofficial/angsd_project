@@ -9,10 +9,24 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+***Script repository location***
+
+The scripts for all commands are located in aphrodite directory `/home/yus4008/cmpb5004/project/angsd_project/bash_scripts/`. They are also in my ANGSD github repository [angsd_project/bash_scripts](https://github.com/kevinsunofficial/angsd_project/tree/main/bash_scripts). For both repositories:
+
+- `download.sh` - parse the SRA table and download the dataset from ENA
+- `fastqc_trim.sh` - run fastqc analysis before and after the reads have been trimmed by trim-galore
+- `create_index.sh` - create hg_38STARindex for STAR alignment
+- `align.sh` - perform STAR alignment with created index and trimmed reads
+- `bamqc.sh` - run bamqc and multiqc on the alignment results
+
 ***1. Download at least one FASTQ file that you will be working with for your project. Document the following details:***
 
+*The following code chunk only shows the most crucial commands contained in the corresponding `.sh` script. The full details (including variable definition, mamba environment, loop definitions, etc.) are in the repositories mentioned above.*
+
 ```{download_from_ENA}
-wget -O $fastqfile_output ftp://$ftplink
+# download.sh
+wget -O $fastq1 ftp://$line1
+wget -O $fastq2 ftp://$line2
 ```
 
 * ***where did you get it from?***
@@ -43,6 +57,51 @@ wget -O $fastqfile_output ftp://$ftplink
 
 ***2. Align the FASTQ file with an appropriate aligner (you may have to build a new index). Document:***
 
+*The following code chunks only show the most crucial commands contained in the corresponding `.sh` script. The full details (including variable definition, mamba environment, loop definitions, etc.) are in the repositories mentioned above.*
+
+```{fastqc_before_and_after_trim_with_multiqc}
+# fastqc_trim.sh
+fastqc $file --noextract --outdir $fastqc_out_dir
+multiqc -o $untrim_multiqc_dir $untrim_fastqc_dir
+
+trim_galore --illumina --paired --output_dir $trim_out_dir --stringency 13 $file $file2
+
+fastqc $file --noextract --outdir $fastqc_out_dir
+multiqc -o $trim_multiqc_dir $trim_fastqc_dir
+```
+
+```{create_STAR_index}
+# create_index.sh
+STAR --runMode genomeGenerate \
+     --runThreadN 1 \
+     --genomeDir $ref_dir \
+     --genomeFastaFiles $genome_seq \
+     --sjdbGTFfile $genome_annot \
+     --sjdbOverhang 99
+```
+
+```{run_STAR_alignment_and_samtools}
+# align.sh
+STAR --runMode alignReads \
+     --runThreadN 1 \
+     --genomeDir $ref_dir \
+     --readFilesIn $file $file2 \
+     --readFilesCommand zcat \
+     --outFileNamePrefix $out_dir \
+    --outSAMtype BAM SortedByCoordinat
+
+samtools index $out_file
+samtools flagstat $out_file > $out_flagstat
+samtools stats $out_file > $out_stats
+```
+
+```{run_bamqc_multiqc_after_alignment}
+# bamqc.sh
+/softlib/apps/EL7/BamQC/bin/bamqc -o $bamqc_out_dir --noextract $bamqc_use_dir*.bam
+
+multiqc -o $multiqc_dir $aln_dir
+```
+
 * ***parameters (and why you chose them)***
   + I used trim-galore to trim the reads. I used parameter of `--stringency 13` because the trim analysis suggests that with stringency being 13, it is more likely to prevent potentially wrong adapter trimming due to small overlaps. I also used `--paired` command to notify trim-galore that I'm trimming paired-end reads, and input two paired-end `.fastq.gz` files simultaneously.
   + I used STAR aligner. I first created an index for STAR with `--sjdbOverhang 99`. The reason I didn't use read `length-1` is that I did trim-galore on the reads, therefore the trimmed reads are not uniformly with read length of 150bp. In the STAR manual it suggests that in most cases, the default value of 100 as read length will work well, therefore I chose 100-1=99 for this parameter.
@@ -50,3 +109,4 @@ wget -O $fastqfile_output ftp://$ftplink
 
 * ***summary of outcome and basic QC***
   + I compared the FastQC results for the untrimmed vs. trimmed sequences. It suggests that trim-galore reduced the number of overrepresented sequences (10 in untrimmed vs. 6 in trimmed), and cleaned the adapter contamination totally (all 12 in untrimmed have adapter contamination, 0 in trimmed has adapter contamination). However, trimmed sequences do have variable lengths (most still have length >= 147bp), whereas untrimmed sequences all have length of 150bp.
+  + For bamqc results, both symptomatic and uninfected group has high MAPQ value overall, suggesting high overall quality of the alignment. The multiqc report of STAR shows about 85% of the reads are uniquely mapped (for both uninfected SRR15058619 and symptomatic SRR15058638).

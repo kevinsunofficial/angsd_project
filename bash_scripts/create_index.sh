@@ -54,7 +54,7 @@ STAR --runMode genomeGenerate \
      --genomeDir $ref_dir \
      --genomeFastaFiles $genome_seq \
      --sjdbGTFfile $genome_annot \
-     --sjdbOverhang 99
+     --sjdbOverhang 149
 
 cd $script_dir
 
