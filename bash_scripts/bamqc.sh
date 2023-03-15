@@ -8,6 +8,7 @@
 #SBATCH --mem=32G
 #SBATCH --mail-user=yus4008@med.cornell.edu
 #SBATCH --mail-type=ALL
+#SBATCH --output=bamqc.out
 
 
 script_dir="/home/yus4008/cmpb5004/project/angsd_project/bash_scripts/"

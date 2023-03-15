@@ -8,6 +8,7 @@
 #SBATCH --mem=64G
 #SBATCH --mail-user=yus4008@med.cornell.edu
 #SBATCH --mail-type=ALL
+#SBATCH --output=align.out
 
 
 script_dir="/home/yus4008/cmpb5004/project/angsd_project/bash_scripts/"
