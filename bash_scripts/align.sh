@@ -16,7 +16,7 @@ dataset_dir="/athena/angsd/scratch/yus4008/project/dataset/"
 ref_dir="${dataset_dir}hg38_STARindex"
 alignment_dir="${dataset_dir}trim_alignments/"
 
-limit=1
+limit=1000
 
 mamba activate angsd
 

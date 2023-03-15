@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --job-name=fastqc_trim
 #SBATCH --time=08:00:00
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --mail-user=yus4008@med.cornell.edu
 #SBATCH --mail-type=ALL
 #SBATCH --output=fastqc_trim.out
