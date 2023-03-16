@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --job-name=fastqc_trim
-#SBATCH --time=08:00:00
+#SBATCH --time=24:00:00
 #SBATCH --mem=64G
 #SBATCH --mail-user=yus4008@med.cornell.edu
 #SBATCH --mail-type=ALL
