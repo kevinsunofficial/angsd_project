@@ -43,3 +43,6 @@ vignettes/*.pdf
 
 # log out file
 *.out
+
+# feature counts file
+feature_counts*
