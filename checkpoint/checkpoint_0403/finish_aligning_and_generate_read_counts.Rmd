@@ -1,0 +1,84 @@
+---
+title: "Finish Aligning and Generate Read Counts"
+author: "Yuchen Sun"
+date: "2023-03-18"
+output:
+  html_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Script repository location
+
+***1. Set up a github repository where you will store all your scripts, and ideally, even your report at one point. Submit the URL of your repo.***
+
+All project related scripts and documents are located in my ANGSD github repository [kevinsunofficial/angsd_project](https://github.com/kevinsunofficial/angsd_project). They are also located in my aphrodite directory `/home/yus4008/cmpb5004/project/angsd_project/`. For both repositories:
+
+- `download.sh` - parse the SRA table and download the dataset from ENA
+- `fastqc_trim.sh` - run fastqc analysis before and after the reads have been trimmed by trim-galore
+- `create_index.sh` - create hg_38STARindex for STAR alignment
+- `align.sh` - perform STAR alignment with created index and trimmed reads
+- `featureCounts.sh` - perform featureCounts and create read counts for all samples (trimmed)
+- `bamqc.sh` - run bamqc and multiqc on the alignment results
+
+### Align all samples
+
+***2. Align all your samples. Ideally use a for-loop within a script, i.e., automate and standardize the task to a certain extent, but do remember that legibility is valuable, too.***
+
+The scripts for performing STAR alignment for all samples are located in `align.sh` as mentioned above. The pseudocode for the major logistic behind the script is described here:
+
+```{pseudocode_align_all_samples,warning=F}
+for response in uninfected symptomatic
+do
+    for file in response/paired_read1
+    do
+        get all information
+        if not aligned already
+        then
+            STAR --runMode alignReads --readFilesIn paired_read1 paired_read2
+            samtools index out_file
+        fi
+        if flagstat not exist
+        then
+            samtools flagstat out_file > out_flagstat
+        fi
+        if outstat not exist
+        then
+            samtools stats out_file > out_stats
+        fi
+    done
+done
+```
+
+### Generate read count table
+
+***3. Generate a read count table.***
+
+The scripts for performing STAR alignment for all samples are located in `featureCounts.sh` as mentioned above. The pseudocode for the major logistic behind the script is described here:
+
+```{pseudocode_feature_counts,warning=F}
+featureCounts -p --countReadPairs -a gtf_file -t exon -g gene_id -o out_dir all_bam_files
+```
+
+### Load read counts
+
+***4. Load the read count table into R and perform the quality controls and processing steps that we discussed in class.***
+
+*`scp` `feature_counts.txt` and `feature_counts.txt.summary` from `/athena/angsd/scratch/yus4008/project/dataset/featureCounts/`.*
+
+```{r environment_setup,warning=F,message=F}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+wd <- "C:/Yuchen/WCM/Courses/2023Spring/CMPB5004/project/angsd_project/fc_result/"
+```
+
+```{r load_read_count_table}
+readcounts <- read.table(paste0(wd,"feature_counts.txt"),header=T)
+orig_names <- names(readcounts)
+names(readcounts) <- gsub(".*(symptomatic|uninfected).(SRR)([0-9]{8}).*","\\2\\3.\\1",orig_names)
+str(readcounts)
+```
