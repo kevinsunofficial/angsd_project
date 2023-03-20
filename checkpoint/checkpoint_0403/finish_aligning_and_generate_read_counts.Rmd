@@ -73,12 +73,39 @@ featureCounts -p --countReadPairs -a gtf_file -t exon -g gene_id -o out_dir all_
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
+library(DESeq2)
 wd <- "C:/Yuchen/WCM/Courses/2023Spring/CMPB5004/project/angsd_project/fc_result/"
 ```
 
 ```{r load_read_count_table}
+# load read counts and format the data table
 readcounts <- read.table(paste0(wd,"feature_counts.txt"),header=T)
 orig_names <- names(readcounts)
-names(readcounts) <- gsub(".*(symptomatic|uninfected).(SRR)([0-9]{8}).*","\\2\\3.\\1",orig_names)
+# preserve the SRR ID only
+names(readcounts) <- gsub(".*(symptomatic|uninfected).(SRR)([0-9]{8}).*","\\2\\3",orig_names)
 str(readcounts)
+```
+
+```{r make_deseq2_count_col_data}
+# generate the countData and colData for DESeq2 from the formatted read count
+row.names(readcounts) <- make.names(readcounts$Geneid)
+readcounts <- readcounts[,-c(1:6)]
+head(readcounts)
+sample_info <- data.frame(condition=gsub(".*(symptomatic|uninfected).*","\\1",orig_names)[-c(1:6)],
+                          row.names=names(readcounts))
+sample_info
+```
+
+```{r make_and_filter_deseq_dataset}
+# make the DESeq dataset from formatted countData and colData
+DESeq.ds <- DESeqDataSetFromMatrix(countData=as.matrix(readcounts),colData=sample_info,design=~condition)
+DESeq.ds
+head(counts(DESeq.ds))
+colSums(counts(DESeq.ds))
+dim(DESeq.ds)
+
+# remove genes with 0 reads
+keep_genes <- rowSums(counts(DESeq.ds))>0
+DESeq.ds <- DESeq.ds[keep_genes,]
+dim(DESeq.ds)
 ```
