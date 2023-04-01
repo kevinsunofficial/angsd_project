@@ -1,1 +1,1 @@
-# angsd_project
+# CMPB5004 ANGSD Final Project
