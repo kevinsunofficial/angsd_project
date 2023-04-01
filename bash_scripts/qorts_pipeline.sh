@@ -11,3 +11,8 @@
 #SBATCH --output=qorts.out
 
 bash -l make_decoder.sh
+bash -l run_qorts.sh
+
+mamba activate qorts
+Rscript plot.R
+mamba deactivate
