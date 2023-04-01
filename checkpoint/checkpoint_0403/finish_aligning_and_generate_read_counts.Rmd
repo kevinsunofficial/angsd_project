@@ -74,8 +74,11 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 library(DESeq2)
+library(magrittr)
 wd <- "C:/Yuchen/WCM/Courses/2023Spring/CMPB5004/project/angsd_project/fc_result/"
 ```
+
+#### Load read count table
 
 ```{r load_read_count_table}
 # load read counts and format the data table
@@ -85,6 +88,8 @@ orig_names <- names(readcounts)
 names(readcounts) <- gsub(".*(symptomatic|uninfected).(SRR)([0-9]{8}).*","\\2\\3",orig_names)
 str(readcounts)
 ```
+
+#### Make and filter DESeq2 dataset
 
 ```{r make_deseq2_count_col_data}
 # generate the countData and colData for DESeq2 from the formatted read count
@@ -96,7 +101,7 @@ sample_info <- data.frame(condition=gsub(".*(symptomatic|uninfected).*","\\1",or
 sample_info
 ```
 
-```{r make_and_filter_deseq_dataset}
+```{r make_and_filter_deseq_dataset, warning=F}
 # make the DESeq dataset from formatted countData and colData
 DESeq.ds <- DESeqDataSetFromMatrix(countData=as.matrix(readcounts),colData=sample_info,design=~condition)
 DESeq.ds
@@ -109,3 +114,32 @@ keep_genes <- rowSums(counts(DESeq.ds))>0
 DESeq.ds <- DESeq.ds[keep_genes,]
 dim(DESeq.ds)
 ```
+
+#### Process DESeq2 dataset with log normalization and PCA
+
+```{r log_normalized_counts}
+DESeq.ds <- estimateSizeFactors(DESeq.ds)
+assay(DESeq.ds,"log.norm.counts") <- log2(counts(DESeq.ds,normalized=T)+1)
+```
+
+```{r run_pca_on_log_norm_counts}
+log.norm.counts = assay(DESeq.ds,"log.norm.counts")
+pca <- prcomp(log.norm.counts,scale=T)
+head(pca$rotation[,1:5])
+qplot(c(1:length(pca$sdev)),pca$sdev^2/sum(pca$sdev^2)*100) + geom_line() +
+  labs(x="PC",y="Variance Explained",main="Scree Plot") + ylim(0,100)
+```
+
+#### Run differential expression analysis
+
+```{r prepare_run_DE_analysis}
+DESeq.ds$condition %<>% relevel(ref="uninfected")
+DESeq.ds %<>% DESeq()
+```
+
+```{r run_DE_analysis}
+rowData(DESeq.ds) %>% colnames
+DGE.results <- results(DESeq.ds,independentFiltering=T,alpha=0.05)
+```
+
+
