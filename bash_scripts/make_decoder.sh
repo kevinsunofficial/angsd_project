@@ -3,12 +3,12 @@
 bamfile_dir="/athena/angsd/scratch/yus4008/project/dataset/trim_alignments/"
 dcdtxt="/athena/angsd/scratch/yus4008/project/dataset/qc_analysis/qorts/decoder.txt"
 
-echo -e "unique.ID\tgroup.ID" > ${dcdtxt}
-
 if [ -f "$dcdtxt" ]
 then
     rm $dcdtxt
 fi
+
+echo -e "unique.ID\tgroup.ID" > ${dcdtxt}
 
 for response in uninfected symptomatic
 do

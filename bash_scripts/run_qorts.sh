@@ -17,7 +17,7 @@ do
         then
             mkdir $outdir
         fi
-        qorts -Xmx16G QC --generatePlots --maxPhredScore 45 $file $gtffile $outdir
+        qorts -Xmx16G QC --generatePlots --maxPhredScore 45 --maxReadLength 150 $file $gtffile $outdir
     done
 done
 
