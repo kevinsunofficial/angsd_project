@@ -5,6 +5,10 @@ dcdtxt="/athena/angsd/scratch/yus4008/project/dataset/qc_analysis/qorts/decoder.
 
 echo -e "unique.ID\tgroup.ID" > ${dcdtxt}
 
+if [ -f "$dcdtxt" ]
+then
+    rm $dcdtxt
+fi
 
 for response in uninfected symptomatic
 do
