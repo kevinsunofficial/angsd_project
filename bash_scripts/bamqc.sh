@@ -30,10 +30,3 @@ do
 done
 
 mamba deactivate
-
-mamba activate multiqc
-
-echo -e "multiqc -o ${multiqc_dir} ${aln_dir}"
-multiqc -o $multiqc_dir $aln_dir
-
-mamba deactivate
