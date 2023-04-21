@@ -5,11 +5,10 @@ date: "`r Sys.Date()`"
 output:
     pdf_document:
         toc: yes
-indent: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo=T,tidy.opts=list(width.cutoff=60),tidy=T)
+knitr::opts_chunk$set(echo=T,tidy.opts=list(width.cutoff=65),tidy=T,warning=F,message=F)
 ```
 
 ```{r setup_environment, include=F}
@@ -30,7 +29,10 @@ wd <- "C:/Yuchen/WCM/Courses/2023Spring/CMPB5004/project/angsd_project/fc_result
 
 ## Introduction
 
-## Results
+The coronavirus disease-2019 (COVID-19), caused by the severe acute respiratory syndrome coronavirus (SARS-CoV-2), was first detected in Wuhan, China, back in December 2019, and developed to a critical global pandemic over the past three years. There has been many studies towards the nature of SRAS-CoV-2 as well as the mechanism of viral invasion, so that more effective treatments can be developed. It is faily understood that the virus invades human cells by attaching the Spike structure to the ACE2 receptor on human cells and further hijacking the host cells' ability of replication and transcription^1^. However, the more complicated situation which is not fully studied at this point is the gene regulation behind the viral invasion, and there is not yet a comprehensive answer to the question regarding the difference of gene expression in the healthy people versus that in a COVID-19 patient.
+
+Given that human peripheral blood mononuclear cells (PBMC) has crucial function in human immune system, it is very valuable to study the PMBC transcriptomic difference in healthy versus infected people and to extract potentially differentially expressed genes, as these genes might provide more insight into the underlying pathway of COVID-19 associated severe symptoms as well as shedding light on better potential targets for pharmaceutical treatments against COVID-19. Hence, this project collects human PBMC transcriptome dataset and conducted differential gene analysis, focusing on significant differential expression of genes related to crucial cytokine storm pathways such as NF-$\kappa$B pathway.
+
 
 ## Methods
 
@@ -41,16 +43,19 @@ The data used in this project is linked to this paper^1^. The data description m
 ### Read preprocessing
 
 After downloading all read files, a FastQC run is used to determine the quality of the raw reads. It was discovered that most of the paired-end reads has high adapter content that failed the quality check. Hence, Trim-Galore was used to trim the raw reads by the command
+
 ```{trim_galore_key_command, warning=F}
 trim_galore --illumina --paired \
             --output_dir $trim_out_dir \
             --stringency 13 $file $file2
 ```
+
 Notice that the parameter `--illumina` and `--paired` was added to the command given that the original raw reads are produced by illumina paired-end sequencing, and that the parameter `--stringency 13` is set as it is a length threshold more likely to prevent potentially wrong adaptor trimming due to small overlaps (this threshold was chosen according to previous runs of Trim-Galore on the same data). `$trim_out_dir` represents the directory that holds the trimmed reads output of Trim-Galore, whereas `$file` and `file2` represents the two paired-end reads. After running Trim-Galore, another FastQC run is used to determine the quality of the trimmed reads, which are all proven to have low adatper content and are available for further processing. All scripts for this part of the preprocessing is put into a bash script to enable automatic FastQC run before and after Trim-Galore trimming.
 
 ### Sequence alignment
 
 In this project, STAR alignment tool is used to align the trimmed reads to the genome. Before running actual alignments, an index for STAR alignment is created by the command
+
 ```{STAR_index_creation_key_command, warning=F}
 STAR --runMode genomeGenerate \
      --runThreadN 1 \
@@ -59,9 +64,11 @@ STAR --runMode genomeGenerate \
      --sjdbGTFfile $genome_annot \
      --sjdbOverhang 149
 ```
+
 Notice that the parameter `--sjdbOverhang 149` was added to the command instead of the default value (99) in order to reflect the fact that the original raw reads are produced by 2 $\times$ 150bp paired-end sequencing protocal, given that the best value for this parameter is usually the sequence length - 1. `--genomeDir $ref_dir` represents the directory that holds the STAR index output, where as `--genomeFastaFiles $genome_seq` and `--sjdbGTFfile $genome_annot` represents the actual genome sequence file (in `FASTA` format) and the genome annotation file (in `GTF` format), respectively. Human genome `hg38` is used in this project, and a bash script is used to download both genome files (`hg38.fa.gz` and `hg38.ncbiRefSeq.gtf.gz`) from the [UCSC Genome Data website](https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/) using `wget`. The script also contains the commands to execute the STAR index creation after verifying that the required genome files are downloaded and gzipped in the correct directory.
 
 After creating the index, the STAR alignment is performed by the command
+
 ```{STAR_alignment_key_command, warning=F}
 STAR --runMode alignReads \
      --runThreadN 1 \
@@ -71,12 +78,15 @@ STAR --runMode alignReads \
      --outFileNamePrefix $out_dir \
      --outSAMtype BAM SortedByCoordinate
 ```
+
 Notice that parameter for file input `--readFilesIn` is provided with two files (`$file` and `$file2`) in order to simultaneously align the two paired-end reads from each sample. `--genomeDir $ref_dir` represents the directory that holds the STAR index just created, whereas `--outFileNamePrefix $out_dir` represents the directory that holds the STAR alignment output files. `--readFilesCommand zcat` was also added in order to directly access read files in a gzipped format. Finally, `--outSAMtype BAM` is used to change the alignment output file to `BAM` format in order to save memory usage, and `SortedByCoordinate` parameter was added to force the alignment results to be sorted by their coordinate in the reference genome.
 
 After performing STAR alignment, `samtools` was also used to index the alignment output (in `BAM` format) by the command
+
 ```{samtools_index_key_command, warning=F}
 samtools index $out_file
 ```
+
 A separate bash script containing the STAR alignment commands and the samtools commands is used to allow automatic alignment, sorting, and indexing procedure for each sample used in this project.
 
 With these steps, the sequence alignment in this project would produce an indexed and sorted by coordinate `BAM` file for each sample as the alignemnt output.
@@ -84,23 +94,31 @@ With these steps, the sequence alignment in this project would produce an indexe
 ### Quality control
 
 This project conducts FastQC run as one method of quality control, as introduced in the previous section (see Read preprocessing), in order to monitor the quality of the raw reads and the trimmed reads after performing Trim-Galore. FastQC is performed by the command
+
 ```{FastQC_key_command, warning=F}
 fastqc $file --noextract --outdir $fastqc_out_dir
 ```
+
 On the test run of the read files from 12 samples, the raw reads of these samples all fails the adapter content check by FastQC. However, after performing Trim-Galore, all 12 trimmed reads has low adapter content that passes the adapter content test. This continues to be true for all trimmed reads from other samples after performing Trim-Galore. However, it is worth noticing from the FastQC result that both of the paired-end reads of sample SRR15058644 contains higher overrepresented sequences level, causing a warning to be raised.
 
-This project also conducts QoRTs run as another qualtity control in order to monitor the quality of the alignment results. QoRTs is performed by the command 
+This project also conducts QoRTs run as another qualtity control in order to monitor the quality of the alignment results. QoRTs is performed by the command
+
 ```{QoRTs_key_command, warning=F}
-qorts -Xmx16G QC --generatePlots --maxPhredScore 45 --maxReadLength 150 $file $gtffile $outdir
+qorts -Xmx16G QC --generatePlots \
+      --maxPhredScore 45 --maxReadLength 150 \
+      $file $gtffile $outdir
 ```
+
 The plots for QoRTs are generated by running first a bash script that creates the decoder for plotting, then a bash script with the command above to perform QoRTs, and finally an R code that reads in the decoder as well as the QoRTs result, returning the plots in a PDF format. It was discovered that the cumulative gene assignment diversity appears to be of the correct trend, and that the gene-body coverage is roughly uniform across the gene body for all samples. Some concerns are raised from examing the QoRTs result: one sample from the symptomatic group contains high percentage of reads from MT chromosome, and all samples from symptomatic group seems to have higher percentage of intron coverage. The extra gene content from the MT origin can be processed in loading the preprocessing the feature counts (which can remove gene counts from mitochondrial genes), but it is admittedly unclear whether the higher intron coverage of the symptomatic group is due to genetic reasons specific to the group or some type of contamination.
 
 ### Feature counts
 
 The feature counts for this project is created by the `featureCounts` with the command
+
 ```{feature_counts_key_command, warning=F}
 featureCounts -p --countReadPairs -a $gtf -t exon -g gene_id -o $fc_dir $bam_dir*/*.bam
 ```
+
 Notice that the parameter `--countReadPairs` was added in order to specify the paired-end nature of the reads. A bash script containing the command above is used to automatically run feature counts for all alignment results (in `BAM` format) and store the output feature counts information in the corresponding directory. The feature counts is then read into `R` with the DESeq2 object to perform preprocessing and quality control steps.
 
 ```{r load_feature_counts_table_to_DESeq, message=F, warning=F}
@@ -148,25 +166,86 @@ The dataset is then normalized to eliminate the non-biological difference on the
 
 In this project, the differential gene analysis is performed by using DESeq2 function `DESeq()` on the preprocessed and log normalized dataset. The results of differential gene analysis is then adjusted for multiple hypothesis testing correction and cleaned by removing genes with an `NA` in either p-value or adjusted p-value. The alpha for significance is chosen to be 0.05, so that a gene is deemed as differentially expressed only when it has an adjusted p-value of less than 0.05. In order to cope with the unreliable fold change results for genes with noisy expression values, and to better integrate the solution for plotting, the log FC shrink is also performed on the dataset to generate a more valid result.
 
-```{r differential_gene_analysis_process, message=F, warning=F}
+```{r DGE_analysis_process, message=F, warning=F}
 # perform differential expression analysis
 DESeq.ds$condition %<>% relevel(ref="uninfected")
 DESeq.ds %<>% DESeq()
-# retrieve raw DGE results
-DGE.results <- na.omit(results(DESeq.ds,independentFiltering=T,alpha=0.05))
-# retrieve lfcShrink-ed DGE results
+# retrieve raw and sorted DGE results
+DGE.results.raw <- na.omit(results(DESeq.ds,independentFiltering=T,alpha=0.05))
+DGE.results.raw.sorted <- DGE.results.raw %>% `[`(order(.$padj),)
+
+# retrieve lfcShrink-ed and sorted DGE results
 DGE.results.shrnk <- lfcShrink(DESeq.ds,coef=2,type="apeglm")
 # remove genes associated with RNA component and pseudogenes
 clean_gene <- !(grepl('(RNA|LOC|SNOR)',rownames(DGE.results.shrnk)))
 DGE.results.clean <- na.omit(DGE.results.shrnk[clean_gene,])
+DGE.results.clean.sorted <- DGE.results.clean %>% `[`(order(.$padj),)
+
+# subset significant genes
+DGE.genes <- subset(DGE.results.clean.sorted,padj<0.05)
+DGE.genes <- subset(DGE.genes,abs(log2FoldChange)>1)
+DGE.genes.names <- rownames(DGE.genes)
 ```
 
+
+## Results
+
+### Significant differentially expressed genes
+
+
+```{r heatmap_significant_DGE, message=F, warning=F, fig.width=6, fig.height=6, fig.align='center'}
+# generate heat maps of differentially expressed genes
+rlog.dge <- DESeq.rlog[DGE.genes.names,] %>% assay
+pheatmap(rlog.dge,scale='row',show_rownames=F,main="DGE (row-based z-score)")
+```
+
+
+```{r volcano_plot_significant_DGE, message=F, warning=F, fig.width=8, fig.height=10, fig.align='center'}
+# select key genes
+key_genes <- "^(IL2R|IL6R|TNFAIP|CCL2&|CXCL10|TNFSF10|TP53INP|TAB2|IFNG)"
+DGE.genes.names.key <- DGE.genes.names[grep(key_genes,DGE.genes.names)]
+# generate volcano plot of differentially expressed genes
+EnhancedVolcano(DGE.results.clean,lab=rownames(DGE.results.clean),
+                selectLab=DGE.genes.names.key,
+                boxedLabels=T,labCol = 'black',
+                labFace = 'bold',drawConnectors=T,
+                widthConnectors=1.0,colConnectors='black',
+                pointSize=3.0,labSize=4.0,colAlpha=0.75,
+                x='log2FoldChange',y='padj',
+                pCutoff=0.05,FCcutoff=2.0,
+                title='Symptomatic vs. Uninfected')
+```
+
+
 ## Discussion
+
+IL2, IL6, IL7, IL10, GSCF, IP10, MCP1, MIP1A, and TNFA
+CCL2, CXCL2, CCL8, CXCL1, IL33, CCL3L1
+CXCL10, TNFSF10, TIMP1, C5, IL18, AREG, NRG1, IL10
+TP53
+
+TRAF2, TRAF5, TRAF6, TRADD, FADD, CARD11, TIRAP, TRAM, TRIF, RIP1
+P50, P65, TAK1, TAB2/3, IKK
+
+have
+IL2R (A, B, G, BG internalized and degraded, A recycled) - RA upregulate, RB,RG downregulate
+IL6R upregulate
+TNFAIP (8 positive regulation of apoptotic process, 2,3 inhibit NFKB, involved in inflammatory response), 8 upregulate, 2,3 downregulate
+CCL2 upregulate
+CXCL10 upregulate (cytokine storm regulator)
+TNFSF10 upregulate (induce apoptosis)
+IL18 downregulate ??
+TP53 upregulate
+TAB2 upregulate (induce NFKB)
+
 
 ## Code Availability
 
 All scripts related to this project, including bash scripts, R scripts, R Markdown scripts, etc., as well as some intermediate checkpoints results, can all be found in the public GitHub repository [kevinsunofficial/angsd_project](https://github.com/kevinsunofficial/angsd_project). The contents are also available on the Weill Cornell Aphrodite server following directory `/home/yus4008/cmpb5004/project/angsd_project/`. The data availablity is explained in the Methods section of this report (see Data downloading).
 
+
 ## Reference
 
-1. Zhang, J., Lin, D., Li, K., Ding, X., Li, L., Liu, Y., Liu, D., Lin, J., Teng, X., Li, Y., Liu, M., Shen, J., Wang, X., He, D., Shi, Y., Wang, D., & Xu, J. (2021). Transcriptome analysis of peripheral blood mononuclear cells reveals distinct immune response in asymptomatic and re-detectable positive COVID-19 patients. *Frontiers in Immunology, 12*. https://doi.org/10.3389/fimmu.2021.716075
+1. Amirfakhryan, H., & Safari, F. (2021). Outbreak of SARS-CoV2: Pathogenesis of infection and cardiovascular involvement. *Hellenic journal of cardiology : HJC = Hellenike kardiologike epitheorese, 62*(1), 13-23. https://doi.org/10.1016/j.hjc.2020.05.007
+
+2. Zhang, J., Lin, D., Li, K., Ding, X., Li, L., Liu, Y., Liu, D., Lin, J., Teng, X., Li, Y., Liu, M., Shen, J., Wang, X., He, D., Shi, Y., Wang, D., & Xu, J. (2021). Transcriptome analysis of peripheral blood mononuclear cells reveals distinct immune response in asymptomatic and re-detectable positive COVID-19 patients. *Frontiers in Immunology, 12*. https://doi.org/10.3389/fimmu.2021.716075

@@ -56,7 +56,7 @@ DESeq.ds <- DESeqDataSetFromMatrix(countData=as.matrix(readcounts),colData=sampl
 DESeq.ds
 
 # remove poor reads
-keep_samples <- !(colnames(DESeq.ds) %in% c("SRR15058619","SRR15058622","SRR15058623"))
+keep_samples <- !(colnames(DESeq.ds)=="SRR15058644")
 DESeq.ds <- DESeq.ds[,keep_samples]
 # remove genes with 0 reads
 keep_genes <- rowSums(counts(DESeq.ds))>0
@@ -150,7 +150,7 @@ head(DGE.results.sorted)
 
 ```{r plot_counts}
 par(mfrow=c(1,2))
-plotCounts(DESeq.ds,gene="MYCT1",normalized=T,xlab="")
+plotCounts(DESeq.ds,gene="TP53",normalized=T,xlab="")
 plotCounts(DESeq.ds,gene=which.max(DGE.results$padj),xlab="",
            main="Gene with max p.adj")
 ```
