@@ -127,21 +127,45 @@ DESeq.ds <- DESeq.ds[keep_genes,]
 nonmt_genes <- !(grepl('^MT',rownames(DESeq.ds)))
 DESeq.ds <- DESeq.ds[nonmt_genes]
 
+DESeq.ds
+```
+
+In preprocessing and quality control steps, after the feature counts table is read into R, only the SRR ID is kept as the name for each sample. However, a table containing the information of each sample and its corresponding group (either uninfected or symptomatic) is kept. The genes are also renamed by the gene ID. After the read counts table is added to a DESeq2 dataset object, samples with poor reads (SRR15058644 due to higher overrepresented sequence level), mitochondrial genes, and genes with 0 reads are removed from the dataset.
+
+```{r log_normalize_dataset, message=F, warning=F}
 # estimate size factors
 DESeq.ds <- estimateSizeFactors(DESeq.ds)
 # log normalize the dataset
 assay(DESeq.ds,"log.norm.counts") <- log2(counts(DESeq.ds,normalized=T)+1)
 
-DESeq.ds
+# perform r log on the dataset
+DESeq.rlog <- rlog(DESeq.ds,blind=T)
 ```
 
-In preprocessing and quality control steps, after the feature counts table is read into R, only the SRR ID is kept as the name for each sample. However, a table containing the information of each sample and its corresponding group (either uninfected or symptomatic) is kept. The genes are also renamed by the gene ID. After the read counts table is added to a DESeq2 dataset object, samples with poor reads (SRR15058644 due to higher overrepresented sequence level), mitochondrial genes, and genes with 0 reads are removed from the dataset. The dataset is then normalized to eliminate the non-biological difference on the dataset, adding the log normalized counts to the dataset as a separate assay.
+The dataset is then normalized to eliminate the non-biological difference on the dataset, adding the log normalized counts to the dataset as a separate assay. In order to reduce the dependence of the variance on the mean, an `rlog` is also performed on the dataset, which then generates a new object for the dataset.
 
 ### Differential gene analysis
+
+In this project, the differential gene analysis is performed by using DESeq2 function `DESeq()` on the preprocessed and log normalized dataset. The results of differential gene analysis is then adjusted for multiple hypothesis testing correction and cleaned by removing genes with an `NA` in either p-value or adjusted p-value. The alpha for significance is chosen to be 0.05, so that a gene is deemed as differentially expressed only when it has an adjusted p-value of less than 0.05. In order to cope with the unreliable fold change results for genes with noisy expression values, and to better integrate the solution for plotting, the log FC shrink is also performed on the dataset to generate a more valid result.
+
+```{r differential_gene_analysis_process, message=F, warning=F}
+# perform differential expression analysis
+DESeq.ds$condition %<>% relevel(ref="uninfected")
+DESeq.ds %<>% DESeq()
+# retrieve raw DGE results
+DGE.results <- na.omit(results(DESeq.ds,independentFiltering=T,alpha=0.05))
+# retrieve lfcShrink-ed DGE results
+DGE.results.shrnk <- lfcShrink(DESeq.ds,coef=2,type="apeglm")
+# remove genes associated with RNA component and pseudogenes
+clean_gene <- !(grepl('(RNA|LOC|SNOR)',rownames(DGE.results.shrnk)))
+DGE.results.clean <- na.omit(DGE.results.shrnk[clean_gene,])
+```
 
 ## Discussion
 
 ## Code Availability
+
+All scripts related to this project, including bash scripts, R scripts, R Markdown scripts, etc., as well as some intermediate checkpoints results, can all be found in the public GitHub repository [kevinsunofficial/angsd_project](https://github.com/kevinsunofficial/angsd_project). The contents are also available on the Weill Cornell Aphrodite server following directory `/home/yus4008/cmpb5004/project/angsd_project/`. The data availablity is explained in the Methods section of this report (see Data downloading).
 
 ## Reference
 
