@@ -5,10 +5,11 @@ date: "`r Sys.Date()`"
 output:
     pdf_document:
         toc: yes
+        fig_caption: false
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo=T,tidy.opts=list(width.cutoff=65),tidy=T,warning=F,message=F)
+knitr::opts_chunk$set(echo=T,tidy.opts=list(width.cutoff=60),tidy=T,warning=F,message=F)
 ```
 
 ```{r setup_environment, include=F}
@@ -192,7 +193,6 @@ DGE.genes.names <- rownames(DGE.genes)
 
 ### Significant differentially expressed genes
 
-
 ```{r heatmap_significant_DGE, message=F, warning=F, fig.width=6, fig.height=6, fig.align='center'}
 # generate heat maps of differentially expressed genes
 rlog.dge <- DESeq.rlog[DGE.genes.names,] %>% assay
@@ -207,14 +207,38 @@ DGE.genes.names.key <- DGE.genes.names[grep(key_genes,DGE.genes.names)]
 # generate volcano plot of differentially expressed genes
 EnhancedVolcano(DGE.results.clean,lab=rownames(DGE.results.clean),
                 selectLab=DGE.genes.names.key,
-                boxedLabels=T,labCol = 'black',
-                labFace = 'bold',drawConnectors=T,
+                boxedLabels=T,labCol='black',
+                labFace='bold',drawConnectors=T,
                 widthConnectors=1.0,colConnectors='black',
                 pointSize=3.0,labSize=4.0,colAlpha=0.75,
                 x='log2FoldChange',y='padj',
                 pCutoff=0.05,FCcutoff=2.0,
                 title='Symptomatic vs. Uninfected')
 ```
+
+
+### GO term analysis
+
+```{r go_term_analysis}
+# construct named vector of 0 and 1 for DEG
+gene.vector <- row.names(DGE.results.clean) %in% DGE.genes.names %>% as.integer
+names(gene.vector) <- row.names(DGE.results.clean)
+# quantify length bias
+pwf <- nullp(gene.vector,'hg19',"geneSymbol",plot.fit=F)
+# test for enrichment of GO terms
+GO.wall <- goseq(pwf,"hg19","geneSymbol")
+# retrieve GO categories of each gene
+go_genes <- getgo(rownames(DGE.results.clean),"hg19","geneSymbol") %>% stack
+sig_GOs <- subset(GO.wall,over_represented_pvalue<0.01)
+# export file for REVIGO plotting
+write.table(sig_GOs[,c("category","over_represented_pvalue")],
+            file="final_GOterms_goseq.txt",
+            quote=F,row.names=F,col.names=F)
+# include Revigo treeplot R script
+source("final_REVIGO_treeplot.R")
+```
+
+![REVIGO Tree Map](final_REVIGO_treeplot.png)
 
 
 ## Discussion

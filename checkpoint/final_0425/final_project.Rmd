@@ -150,7 +150,7 @@ head(DGE.results.sorted)
 
 ```{r plot_counts}
 par(mfrow=c(1,2))
-plotCounts(DESeq.ds,gene="TP53",normalized=T,xlab="")
+plotCounts(DESeq.ds,gene="IL2",normalized=T,xlab="")
 plotCounts(DESeq.ds,gene=which.max(DGE.results$padj),xlab="",
            main="Gene with max p.adj")
 ```
