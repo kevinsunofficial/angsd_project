@@ -310,7 +310,7 @@ save(readcounts,DESeq.ds,DESeq.rlog,
      file=paste0(rswd,"finalproject.RData"))
 ```
 
-All scripts related to this project, including bash scripts, R scripts, R Markdown scripts, etc., together with some intermediate checkpoints results and important dataset files, can all be found in the public GitHub repository [kevinsunofficial/angsd_project](https://github.com/kevinsunofficial/angsd_project). The contents are also available on the Weill Cornell Aphrodite server following directory `/home/yus4008/cmpb5004/project/angsd_project/`. The raw data availablity is explained in the Methods section of this report (see Data downloading). The key datasets are saved as table format using txt files, with all other important datasets saved as RData that can be loaded directly into the environment (RData will not be uploaded). The following table summarizes all output files for this project.
+All scripts related to this project, including bash scripts, R scripts, R Markdown scripts, etc., together with some intermediate checkpoints results, important dataset files, and RData, can all be found in the public GitHub repository [kevinsunofficial/angsd_project](https://github.com/kevinsunofficial/angsd_project). The contents are also available on the Weill Cornell Aphrodite server following directory `/home/yus4008/cmpb5004/project/angsd_project/`. The raw data availablity is explained in the Methods section of this report (see Data downloading). The key datasets are saved as table format using txt files, with all other important datasets saved as RData that can be loaded directly into the environment. The following table summarizes all output files for this project.
 
 ```{r table_of_output_files, echo=F, results='asis'}
 files <- data.frame(filename=c("readcounts.txt",
@@ -324,7 +324,7 @@ files <- data.frame(filename=c("readcounts.txt",
                     availability=c("GitHub, Aphrodite",
                                    "GitHub, Aphrodite",
                                    "GitHub, Aphrodite",
-                                   "Local"))
+                                   "GitHub, Aphrodite"))
 kable(files)
 ```
 
